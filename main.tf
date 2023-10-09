@@ -8,11 +8,27 @@ data "aws_key_pair" "Teehookeypair" {
 
 }
 resource "aws_instance" "teehoo" {
-  ami           = var.ami
+  ami           = var.ami[count.index]
   instance_type = var.instance_type
   key_name      = "Teehookeypair"
   vpc_security_group_ids = [aws_security_group.SG.id]
+  count = length(var.ami)
+   
+  # user_data = <<-EOF 
+  # #!/bin/bash
+  # sudo yum update -y
+  # sudo yum install httpd -y
+  # sudo systemctl start httpd
+  # sudo systemctl enable httpd
+  # EOF
 
+
+  lifecycle {
+    # create_before_destroy = true
+
+    # prevent_destroy = true
+
+  }
 
   tags = {
     Name = "webserver"
@@ -60,9 +76,9 @@ resource "aws_security_group" "SG" {
 
 
 
-output "instance_ip_addr" {
-  value       = aws_instance.teehoo.private_ip
-  description = "The private IP address of the main server instance."
-}
+# output "instance_ip_addr" {
+#   value       = aws_instance.teehoo.private_ip
+#   description = "The private IP address of the main server instance."
+# }
 
 
