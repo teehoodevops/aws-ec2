@@ -13,14 +13,14 @@ resource "aws_instance" "teehoo" {
   key_name      = "Teehookeypair"
   vpc_security_group_ids = [aws_security_group.SG.id]
   count = length(var.ami)
-   
-  # user_data = <<-EOF 
-  # #!/bin/bash
-  # sudo yum update -y
-  # sudo yum install httpd -y
-  # sudo systemctl start httpd
-  # sudo systemctl enable httpd
-  # EOF
+ 
+  user_data =  <<-EOF
+  #!/bin/bash
+  sudo yum update -y
+  sudo yum install httpd -y
+  sudo systemctl start httpd
+  sudo systemctl enable httpd
+  EOF
 
 
   lifecycle {
@@ -76,9 +76,9 @@ resource "aws_security_group" "SG" {
 
 
 
-# output "instance_ip_addr" {
-#   value       = aws_instance.teehoo.private_ip
-#   description = "The private IP address of the main server instance."
-# }
+output "instance_ip_addr" {
+  value       = aws_instance.teehoo[*].public_ip
+  description = "The private IP address of the main server instance."
+}
 
 
