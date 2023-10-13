@@ -13,14 +13,23 @@ resource "aws_instance" "teehoo" {
   key_name      = "Teehookeypair"
   vpc_security_group_ids = [aws_security_group.SG.id]
   count = length(var.ami)
- 
-  user_data =  <<-EOF
-  #!/bin/bash
-  sudo yum update -y
-  sudo yum install httpd -y
-  sudo systemctl start httpd
-  sudo systemctl enable httpd
-  EOF
+
+   
+  provisioner "remote-exec" {
+   inline = [ 
+      "sudo yum update -y",
+      "sudo yum install httpd -y",
+      "sudo systemctl start httpd",
+      "sudo systemctl enable httpd",
+
+   ]
+   connection {
+    type = "ssh"
+    user = "ec2_user"
+    private_key = data.aws_key_pair.Teehookeypair
+    host = self.public_ip
+   }
+  }
 
 
   lifecycle {
